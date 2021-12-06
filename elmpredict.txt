@@ -1,0 +1,39 @@
+function Y = elmpredict(P2,P,LW,parameter)
+H= kernel_matrix(P2',parameter(1),P');
+Y = (H' * LW)';%Eq. (20a)
+bj1=(1-P(1,:)).*P(2,:).^3+P(1,:).*(1+P(2,:).^3)*exp(-1)+P(1,:).*(1-P(2,:)).*(exp(-P(1,:))-exp(-1))+P(2,:).*((1+P(1,:)).*exp(-P(1,:))-(1-P(1,:)+2.*P(1,:)*exp(-1)));
+B1=P(1,:).*(1-P(1,:)).*P(2,:).*(1-P(2,:));
+Y=bj1+B1.*Y;%Eq. (13)
+end
+
+function [omega,omega1_x,omega2_x,omega1_y,omega2_y] = kernel_matrix(Xtrain,kernel_pars,Xt)
+
+nb_data = size(Xtrain,1);
+    if nargin<3,
+          [m,n]=size(Xtrain);
+        for i=1:m
+            for j=1:m
+                omega(i,j) = exp(-(Xtrain(i,1)-Xtrain(j,1))^2./kernel_pars(1)-(Xtrain(i,2)-Xtrain(j,2))^2./kernel_pars(1));
+                omega1_x(i,j) =-2*omega(i,j)*(Xtrain(i,1)-Xtrain(j,1))/kernel_pars(1);
+                omega1_y(i,j) =-2*omega(i,j)*(Xtrain(i,2)-Xtrain(j,2))/kernel_pars(1);
+                omega2_x(i,j) =-2*omega(i,j)*(-2*Xtrain(i,1)^2+4*Xtrain(i,1)*Xtrain(j,1)-2*Xtrain(j,1)^2+kernel_pars(1))/(kernel_pars(1)^2);
+                omega2_y(i,j) =-2*omega(i,j)*(-2*Xtrain(i,2)^2+4*Xtrain(i,2)*Xtrain(j,2)-2*Xtrain(j,2)^2+kernel_pars(1))/(kernel_pars(1)^2);
+            end
+        end
+    else
+          [m,n]=size(Xtrain);
+          [m1,n1]=size(Xt);
+        for i=1:m
+            for j=1:m1
+                omega(i,j) = exp(-(Xtrain(i,1)-Xt(j,1))^2./kernel_pars(1)-(Xtrain(i,2)-Xt(j,2))^2./kernel_pars(1));
+                omega1_x(i,j) =-2*omega(i,j)*(Xtrain(i,1)-Xt(j,1))/kernel_pars(1);
+                omega1_y(i,j) =-2*omega(i,j)*(Xtrain(i,2)-Xt(j,2))/kernel_pars(1);
+                omega2_x(i,j) =-2*omega(i,j)*(-2*Xtrain(i,1)^2+4*Xtrain(i,1)*Xt(j,1)-2*Xt(j,1)^2+kernel_pars(1))/(kernel_pars(1)^2);
+                omega2_y(i,j) =-2*omega(i,j)*(-2*Xtrain(i,2)^2+4*Xtrain(i,2)*Xt(j,2)-2*Xt(j,2)^2+kernel_pars(1))/(kernel_pars(1)^2);
+            end
+        end
+       
+    end
+end
+
+    
