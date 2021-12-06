@@ -1,0 +1,45 @@
+function [LW] = elmtrainnew(P,T,parameter)
+%Appendix A1
+[H3,H2,H1,H2_1,H1_1] = kernel_matrix(P',parameter(1));
+B1=P(1,:).*(1-P(1,:)).*P(2,:).*(1-P(2,:));
+H1=(H1+H1_1).*(ones(length(B1),1)*B1)';
+B1xy_x=2*P(2,:).*(2*P(1,:) - 1).*(P(2,:) - 1);
+B1xy_y=2*P(1,:).*(2*P(2,:) - 1).*(P(1,:) - 1);
+H2=(H2.*(ones(length(B1),1)*B1xy_x)'+H2_1.*(ones(length(B1),1)*B1xy_y)');
+B2xy=2*P(2,:).*(P(2,:) - 1)+2*P(1,:).*(P(1,:) - 1);
+H3=H3.*(ones(length(B1),1)*B2xy)';   
+H=H1+H2+H3;%Eq.(20c)
+
+bound=6*P(2,:) - 2*exp(-P(1,:)) + P(1,:).*exp(-P(1,:)) + P(2,:).*exp(-P(1,:)) - (4270226869790283*P(1,:).*P(2,:))/1125899906842624;%Eq. (20b)
+LW=((H+speye(length(B1))/parameter(2))\(T'-bound')); 
+end
+
+function [omega,omega1_x,omega2_x,omega1_y,omega2_y] = kernel_matrix(Xtrain, kernel_pars,Xt)
+nb_data = size(Xtrain,1);
+if nargin<3,
+         [m,n]=size(Xtrain);
+        for i=1:m
+            for j=1:m
+                omega(i,j) = exp(-(Xtrain(i,1)-Xtrain(j,1))^2./kernel_pars(1)-(Xtrain(i,2)-Xtrain(j,2))^2./kernel_pars(1));
+                omega1_x(i,j) =-2*omega(i,j)*(Xtrain(i,1)-Xtrain(j,1))/kernel_pars(1);
+                omega1_y(i,j) =-2*omega(i,j)*(Xtrain(i,2)-Xtrain(j,2))/kernel_pars(1);
+                omega2_x(i,j) =-2*omega(i,j)*(-2*Xtrain(i,1)^2+4*Xtrain(i,1)*Xtrain(j,1)-2*Xtrain(j,1)^2+kernel_pars(1))/(kernel_pars(1)^2);
+                omega2_y(i,j) =-2*omega(i,j)*(-2*Xtrain(i,2)^2+4*Xtrain(i,2)*Xtrain(j,2)-2*Xtrain(j,2)^2+kernel_pars(1))/(kernel_pars(1)^2);
+            end
+        end
+    else
+         [m,n]=size(Xtrain);
+          [m1,n1]=size(Xt);
+        for i=1:m
+            for j=1:m1
+                omega(i,j) = exp(-(Xtrain(i,1)-Xt(j,1))^2./kernel_pars(1)-(Xtrain(i,2)-Xt(j,2))^2./kernel_pars(1));
+                omega1_x(i,j) =-2*omega(i,j)*(Xtrain(i,1)-Xt(j,1))/kernel_pars(1);
+                omega1_y(i,j) =-2*omega(i,j)*(Xtrain(i,2)-Xt(j,2))/kernel_pars(1);
+                omega2_x(i,j) =-2*omega(i,j)*(-2*Xtrain(i,1)^2+4*Xtrain(i,1)*Xt(j,1)-2*Xt(j,1)^2+kernel_pars(1))/(kernel_pars(1)^2);
+                omega2_y(i,j) =-2*omega(i,j)*(-2*Xtrain(i,2)^2+4*Xtrain(i,2)*Xt(j,2)-2*Xt(j,2)^2+kernel_pars(1))/(kernel_pars(1)^2);
+            end
+        end
+        
+end
+end
+
