@@ -6,6 +6,6 @@ close all
 P_train=[reshape(xq,[1,11*11]);reshape(yq,[1,11*11])];%Input of training points
 T_train=exp(-P_train(1,:)).*(P_train(1,:)-2+P_train(2,:).^3+6*P_train(2,:));%Output of training points,i.e., f in Eq. (12)
 parameter=[];%Please parameters [kernel parameter, egularization coefficient] here
-[LW] = elmtrainnew1(P_train,T_train,parameter);%,[x(1:20)', x(21:40)'],x(41:60)');
+[LW] = elmtrain(P_train,T_train,parameter);%,[x(1:20)', x(21:40)'],x(41:60)');
 P_test=[0,0.217400000000000,0.587000000000000,0.397100000000000,0.719300000000000,0.875200000000000,0.947100000000000,0.452100000000000,0.298000000000000,0.632000000000000;0.231800000000000,0.749000000000000,0.328500000000000,0.648100000000000,0.287100000000000,0.538000000000000,0.469100000000000,0.824100000000000,0.915300000000000,0.183400000000000];
-Tn_sim = elmpredictnew1(P_train,P_test,LW,parameter);%the solutions
+Tn_sim = elmpredict(P_train,P_test,LW,parameter);%the solutions
